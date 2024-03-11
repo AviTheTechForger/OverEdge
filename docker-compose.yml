@@ -1,0 +1,44 @@
+version: "3.8"
+services:
+  postgres:
+    image: postgres
+    platform: linux/arm64
+    env_file:
+      - .env
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+  scheduler:
+    image: apache/airflow
+    platform: linux/arm64
+    entrypoint: ./scripts/entrypoint.sh
+    deploy:
+      restart_policy:
+        condition: on-failure
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./py_scripts:/opt/airflow/py_scripts
+      - ./s3:/opt/airflow/s3
+      - ./scripts:/opt/airflow/scripts
+  webserver:
+    image: apache/airflow
+    platform: linux/arm64
+    deploy:
+      restart_policy:
+        condition: on-failure
+    command: webserver
+    depends_on:
+      - scheduler
+    env_file:
+      - .env
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./s3:/opt/airflow/s3
+      - ./py_scripts:/opt/airflow/py_scripts
+    ports:
+      - "8080:8080"
