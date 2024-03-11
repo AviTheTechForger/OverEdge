@@ -21,6 +21,8 @@ services:
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
+      - ./py_scripts:/opt/airflow/py_scripts
+      - ./s3:/opt/airflow/s3
       - ./scripts:/opt/airflow/scripts
   webserver:
     image: apache/airflow
@@ -36,5 +38,7 @@ services:
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
+      - ./s3:/opt/airflow/s3
+      - ./py_scripts:/opt/airflow/py_scripts
     ports:
       - "8080:8080"
